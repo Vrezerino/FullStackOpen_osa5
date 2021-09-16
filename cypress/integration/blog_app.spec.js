@@ -1,7 +1,7 @@
 // Nuolifunktiot näyttävät toimivan joten mennään niillä
 
 describe('Blog app', () => {
-	beforeEach(function() {
+	beforeEach(() => {
 		cy.request('POST', 'http://localhost:3001/api/testing/reset')
 
 		const user = {
@@ -81,7 +81,7 @@ describe('Blog app', () => {
 			cy.get('#deleteBlog').should('not.exist')
 		})
 
-		it.only('the blogs are sorted by descending order of likes', () => {
+		it('the blogs are sorted by descending order of likes', () => {
 			cy.createBlog('Test 1')
 			cy.createBlog('Test 2')
 			cy.createBlog('Test 3')
