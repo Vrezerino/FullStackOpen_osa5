@@ -93,21 +93,31 @@ describe('Blog app', () => {
 
 			cy.contains('Test 2').parent().parent().find('button').click()
 			cy.get('#likeBtn').click()
-			cy.wait(100)
+			cy.wait(200)
 			cy.get('#likeBtn').click()
 			cy.get('#closeBlog').click()
 
 			cy.contains('Test 3').parent().parent().find('button').click()
 			cy.get('#likeBtn').click()
-			cy.wait(100)
+			cy.wait(200)
 			cy.get('#likeBtn').click()
-			cy.wait(100)
+			cy.wait(200)
 			cy.get('#likeBtn').click()
 			cy.get('#closeBlog').click()
 
 			cy.visit('http://localhost:3000')
-			cy.get('#title').then(titles => {
-				cy.wrap(titles[0]).should('contain', 'Test 3')
+
+			// Only titles are boldened so it's convenient to wrap <b> tags
+			cy.get('b').then(titles => {
+				cy.wrap(titles).its(0).should('contain', 'Test 3')
+			})
+
+			cy.get('b').then(titles => {
+				cy.wrap(titles).its(1).should('contain', 'Test 2')
+			})
+
+			cy.get('b').then(titles => {
+				cy.wrap(titles).its(2).should('contain', 'Test 1')
 			})
 		})
 	})
