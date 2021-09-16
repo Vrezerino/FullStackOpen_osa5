@@ -1,0 +1,114 @@
+// Nuolifunktiot näyttävät toimivan joten mennään niillä
+
+describe('Blog app', () => {
+	beforeEach(function() {
+		cy.request('POST', 'http://localhost:3001/api/testing/reset')
+
+		const user = {
+			name: 'Tester',
+			username: 'tester',
+			password: 'testpassword'
+		}
+
+		cy.request('POST', 'http://localhost:3001/api/register', user)
+		cy.visit('http://localhost:3000')
+	})
+
+	it('Login form is shown', () => {
+		cy.contains('Log in first!')
+		cy.get('#username').should('exist')
+		cy.get('#password').should('exist')
+	})
+
+	describe('Login', () => {
+		it('is successful with correct credentials', () => {
+			cy.login({ username: 'tester', password: 'testpassword' })
+			cy.contains('Interesting blogs')
+		})
+
+		it('fails with wrong credentials', () => {
+			cy.get('#username').type('tester')
+			cy.get('#password').type('wrong')
+			cy.get('button').click()
+
+			cy.contains('Invalid username or password!')
+		})
+	})
+
+	describe('When logged in', () => {
+		beforeEach(() => {
+			cy.login({ username: 'tester', password: 'testpassword' })
+		})
+
+		it('a blog can be created', () => {
+			cy.get('#openPostForm').click()
+			cy.get('#author').type('Tester')
+			cy.get('#title').type('Test title')
+			cy.get('#url').type('www.test453845934.com')
+			cy.get('#postBtn').click()
+			cy.contains('Test title by Tester')
+		})
+
+		it('a blog can be liked after creation', () => {
+			cy.createBlog('Test title')
+			cy.get('#viewBlog').click()
+			cy.contains('Likes: 0')
+			cy.get('#likeBtn').click()
+			cy.contains('Likes: 1')
+		})
+
+		it('a blog can be removed by its poster', () => {
+			cy.createBlog('Test title')
+			cy.get('#viewBlog').click()
+			cy.get('#deleteBlog').click()
+			cy.get('html').should('not.contain', 'Title: Test title')
+		})
+
+		it('a blog can not be removed by any other than its poster', () => {
+			cy.createBlog('Test title')
+			cy.get('#logoutBtn').click()
+
+			const user2 = {
+				name: 'Tester2',
+				username: 'tester2',
+				password: 'testpassword2'
+			}
+
+			cy.request('POST', 'http://localhost:3001/api/register', user2)
+			cy.login({ username: 'tester2', password: 'testpassword2' })
+
+			cy.get('#viewBlog').click()
+			cy.get('#deleteBlog').should('not.exist')
+		})
+
+		it.only('the blogs are sorted by descending order of likes', () => {
+			cy.createBlog('Test 1')
+			cy.createBlog('Test 2')
+			cy.createBlog('Test 3')
+
+			// parent: <b>, grandparent: actual <div>
+			cy.contains('Test 1').parent().parent().find('button').click()
+			cy.get('#likeBtn').click()
+			cy.get('#closeBlog').click()
+
+			cy.contains('Test 2').parent().parent().find('button').click()
+			cy.get('#likeBtn').click()
+			cy.wait(100)
+			cy.get('#likeBtn').click()
+			cy.get('#closeBlog').click()
+
+			cy.contains('Test 3').parent().parent().find('button').click()
+			cy.get('#likeBtn').click()
+			cy.wait(100)
+			cy.get('#likeBtn').click()
+			cy.wait(100)
+			cy.get('#likeBtn').click()
+			cy.get('#closeBlog').click()
+
+			cy.visit('http://localhost:3000')
+			cy.get('#title').then(titles => {
+				cy.wrap(titles[0]).should('contain', 'Test 3')
+			})
+		})
+	})
+})

@@ -1,0 +1,10 @@
+.blogForm {
+	background-color: rgb(119, 197, 123);
+	border-radius: 7px;
+	width: 70%;
+	max-width: 500px;
+	text-align: center;
+	margin: 3px auto auto auto;
+	display: flex;
+	justify-content: center;
+}

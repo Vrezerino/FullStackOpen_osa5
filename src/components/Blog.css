@@ -1,0 +1,17 @@
+.blog {
+	background-color: rgb(182, 236, 218);
+	border-radius: 7px;
+	width: 70%;
+	max-width: 500px;
+	margin: 0 auto 3px auto;
+	min-height: 25px;
+	word-wrap: break-word;
+	overflow: hidden;
+}
+
+.blog button {
+	border-radius: 7px;
+	float: right;
+	margin: 2px 2px 0px 0px;
+	background-color: rgb(184, 184, 184);
+}
